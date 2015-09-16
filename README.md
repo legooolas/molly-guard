@@ -17,3 +17,7 @@ http://lazarus-corner-of-the-world.blogspot.com/2012/11/rpm-builds-for-molly-gua
 
 
 I didn't want the code to disappear some day, so I decided to upload it to github.
+
+
+---
+Hacked about more recently by David Gardner <http://github.com/legooolas>
