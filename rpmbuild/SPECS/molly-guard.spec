@@ -4,7 +4,7 @@
 # Released under the terms of the Artistic Licence 2.0
 #
 %define rev		.1
-%define ver		0.4.5
+%define ver		0.6.2
 %define debrelease	1
 %define home		http://ftp.debian.org/debian/pool/main/m
 
@@ -25,16 +25,17 @@ License: Artistic Licence 2.0
 Distribution: Debian
 Group: Applications/Internet
 URL: %{home}/%{name}
-Source0: %{url}/%{name}_%{version}.orig.tar.gz
-Source1: %{url}/%{name}_%{version}-%{debrelease}.diff.gz
-Source2: %{url}/%{name}_%{version}-%{debrelease}.dsc
-Source3: Makefile
+#Source0: %{url}/%{name}_%{version}.orig.tar.gz
+#Source1: %{url}/%{name}_%{version}-%{debrelease}.diff.gz
+#Source2: %{url}/%{name}_%{version}-%{debrelease}.dsc
+Source0: %{url}/%{name}_%{version}.tar.xz
+#Source3: Makefile
 Patch0: %{name}-%{version}-run-parts.patch
 Patch1: %{name}-%{version}-Makefile-docbook.patch
-Patch2: %{name}-%{version}-Makefile-doubleslashes.patch
+#Patch2: %{name}-%{version}-Makefile-doubleslashes.patch
 Patch3: %{name}-%{version}-Makefile-installfix.patch
 Patch4: %{name}-%{version}-profile.d.patch
-Patch5: %{name}-%{version}-shutdown-el5.patch
+#Patch5: %{name}-%{version}-shutdown-el5.patch
 Summary: protects machines from accidental shutdowns/reboots
 
 %description
@@ -65,38 +66,55 @@ locally.
 
 %prep
 %setup
-zcat ${RPM_SOURCE_DIR}/%{name}_%{version}-%{debrelease}.diff.gz |patch -p1 -E -s
+#zcat ${RPM_SOURCE_DIR}/%{name}_%{version}-%{debrelease}.diff.gz |patch -p1 -E -s
 %patch -P 0 -p1 -E
 %patch -P 1 -p1 -E
-%patch -P 2 -p1 -E
+#%patch -P 2 -p1 -E
 %patch -P 3 -p1 -E
 %patch -P 4 -p1 -E
-%{?el5:%patch -P 5 -p1 -E}
+#%{?el5:%patch -P 5 -p1 -E}
 
 %build
 make all prefix=%{_prefix} etc_prefix=/
 
 %install
 mkdir -p ${RPM_BUILD_ROOT}
-make install DEST=${RPM_BUILD_ROOT} prefix=%{_prefix} etc_prefix=/
+make install DESTDIR=${RPM_BUILD_ROOT} prefix=%{_prefix} etc_prefix=/
 install -m755 -oroot -groot -d ${RPM_BUILD_ROOT}%{_sysconfdir}/profile.d
 install -m644 -oroot -groot profile.d/* ${RPM_BUILD_ROOT}%{_sysconfdir}/profile.d
 install -m755 -oroot -groot -d ${RPM_BUILD_ROOT}%{_datadir}/doc/%{name}-%{version}-%{release}
-install -m644 -oroot -groot ChangeLog debian/copyright ${RPM_BUILD_ROOT}%{_datadir}/doc/%{name}-%{version}-%{release}
+# Removed Debian changes as unused in this RPM:
+#install -m644 -oroot -groot ChangeLog debian/copyright ${RPM_BUILD_ROOT}%{_datadir}/doc/%{name}-%{version}-%{release}
+install -m644 -oroot -groot debian/copyright ${RPM_BUILD_ROOT}%{_datadir}/doc/%{name}-%{version}-%{release}
 
 %clean
 rm -fr ${RPM_BUILD_ROOT}
 
 %files
 %docdir "%{_datadir}/doc/%{name}-%{version}-%{release}"
-%attr(775, root, root) %dir "%{_datadir}/%{name}"
-%attr(755, root, root) "%{_datadir}/%{name}/shutdown"
+#%attr(775, root, root) %dir "%{_datadir}/%{name}"
+#%attr(755, root, root) "%{_datadir}/%{name}/shutdown"
 %attr(644, root, root) %doc "%{_mandir}/man8/%{name}.8.gz"
 %attr(755, root, root) %config "%{_sysconfdir}/profile.d"
 %attr(755, root, root) %dir "%{_sysconfdir}/%{name}"
-%attr(755, root, root) %dir "%{_sysconfdir}/%{name}/run.d"
+#%attr(755, root, root) %dir "%{_sysconfdir}/%{name}/run.d"
 %attr(755, root, root) %config "%{_sysconfdir}/%{name}/run.d"
 %attr(755, root, root) %dir "%{_sysconfdir}/%{name}/messages.d"
 %attr(644, root, root) %config "%{_sysconfdir}/%{name}/rc"
 %attr(644, root, root) %doc "%{_datadir}/doc/%{name}-%{version}-%{release}"
-%attr(-, root, root) "%{_sbindir}"
+#%attr(-, root, root) "%{_sbindir}"
+# We can't clobber the commands as RPM doesn't like it  :(
+#%attr(-, root, root) %dir "/sbin"
+#%attr(-, root, root) "/sbin/*"
+%exclude "/sbin"
+%exclude "/sbin/*"
+%attr(-, root, root) %dir "/lib/molly-guard"
+%attr(-, root, root) "/lib/molly-guard/*"
+
+#%post
+# TODO : post-install script to:
+#  - Move aside various reboot/shutdown commands (to a /lib/molly-guard/original directory)
+#  - Use "alternatives" to link to the molly-guard commands
+#
+# OR : Use Puppet to handle symlinks for molly-guard, which will auto-clobber updated upstart binaries.
+# OR : Use Puppet to handle "alternatives" links

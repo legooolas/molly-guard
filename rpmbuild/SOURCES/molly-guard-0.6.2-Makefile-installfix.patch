@@ -1,0 +1,20 @@
+--- molly-guard-0.6.2/Makefile	2015-08-31 16:19:45.000000000 +0100
++++ molly-guard-0.6.2-mod/Makefile	2015-09-15 13:33:29.412718178 +0100
+@@ -25,7 +25,7 @@
+ 
+ install: shutdown molly-guard.8
+ 	mkdir -m755 --parent $(DESTDIR)$(libdir)/molly-guard
+-	install -m755 -oroot -oroot shutdown $(DESTDIR)$(libdir)/molly-guard/molly-guard
++	install -m755 -oroot -groot shutdown $(DESTDIR)$(libdir)/molly-guard/molly-guard
+ 	
+ 	mkdir -m755 --parent $(DESTDIR)$(sbindir)
+ 	ln -s $(libdir)/molly-guard/molly-guard $(DESTDIR)$(sbindir)/poweroff
+@@ -38,7 +38,7 @@
+ 	ln -s $(libdir)/molly-guard/molly-guard $(DESTDIR)$(sbindir)/pm-suspend-hybrid
+ 	
+ 	mkdir -m755 --parent $(DESTDIR)$(cfgdir)
+-	install -m644 -oroot -oroot rc $(DESTDIR)$(cfgdir)
++	install -m644 -oroot -groot rc $(DESTDIR)$(cfgdir)
+ 	cp -r run.d $(DESTDIR)$(cfgdir) \
+ 	  && chown root.root $(DESTDIR)$(cfgdir)/run.d && chmod 755 $(DESTDIR)$(cfgdir)/run.d
+ 	
